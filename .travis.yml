@@ -1,0 +1,29 @@
+---
+# We need sudo to docker things
+sudo: required
+
+# A language is required, but we don't actually use it.
+language: ruby
+
+# enable docker
+services:
+  - docker
+
+env:
+  global:
+    - COMMIT=${TRAVIS_COMMIT::6}
+    # AWS_SECRET_ACCESS_KEY, AWS_ACCESS_KEY_ID, and AWS_ECR_ID
+    - secure: vXWY8SsiTeWxnP0xwPC2kRT3diV8Mtf65HpM9ckBN/+/GrA0K1EwpN3WuoIWzZ9SZ2t4LTRmgYy/muij0xjkTQEwMKLcHYNo25n6Xlha1TOzHeuCowaQCyZ8y5yqNZA9V98jQKpaImxYxHfTTK+GgQ9O4IVTPZQqavhTBSrWzFabEupJOSXcF6D5c6iUHAkKvRRZkSV/8U8r/eP3XsApLJxllZtbXwQkB+e477sxEO0WKgSX7ndLqC+onC6WBBWc47g5uXCrllTmGX+TsbeXBPTBhxANwANrAVAzrA/V7GYiqfSNQh3FufetQB0PbZ6uTZVTDV2WPOmbmbV8wtWEntiQqBfIVWa6Wy3h8zLhG+bhdbDNrroTEJFwNuQr1nXZAmn2e6SwA4TkuDiEOOEJF/oBtxqV3BE456/8b+eJlK+x/DiBOyZsQyEfv+MLDCQu3LpfHYQWaTFJKapcwzPSlrqpN65JdxlO8YEQbkYZqm2KkCGdQHrn+Exz4izTdn4c60PzQPNojxA4/fneDqAwXT6W3ACjBehhk8dKRqvXGwTB+o5Zpx7aBqWCGgnyvkKA2vD/C1JLfFlOjz258C64st9G9kj0c8yKOvtLM2tTHKSSqK393qPZpfx5uA89G1qrqiERa2N0EE6jVFMpk9eyk5WC4t47Qn0zB0ZVs+OEBdc=
+    - secure: FvCzm9mRB/gSzlPbvuVkxiQjmJ0Qjkdz5QW1qQ3JAhLIfT9Isad/Z/V2ZMrPASE7wL4UfIuITZX7q8HeqAXU7tMQPa0hOVMyor3Tr6+vJygvXusPVJex9RhXaPthYGkrKphmGGFeqtCF7Opf2s8vKxyq+v3c0z5c9OGl1VsxAuH0vFBiCXlgxsHE5sOyaNho/TY6w/2LNypA+qnPUur7m6wfXrus/yp+Ep+5vIKt+UBNlyejxK7COJ0qc1/6pxlfuGKo2jZ35A8PCqOtZC7m1ujQfmG4zHzIhd3tVrUOxoi580TsY3es/uh9+Q/GO5PMoJrrEHh2bDHnLu7+4bExqtVRvcGY54gF4KcOjW1Hyorfb6k/PQ/uhTAeKoWBR4OcOLl3vrRd9+4WgsiqtTKl9i/qKMmzAMgr+PN9jbR2uDYnNme8n64hX9KKoDqbtjFvzEEDRaHBvy5FK9JaeSBBlzXN6SUuHinIUG8sgr3Ciz6b1F0240aRTm9dqgj15GUVYLcC6dYRElPc05cSWptWux4k7OZveCkzPeIQSHidNvsziOVOOlKj3RM3rGRjJddYLLfSPiP52MdfNOZ3X5WuH4CZGI5DoxEfAFFLbSIdjA2iOdicOrpfAa7kKfVuzNcAYPC1pl/1eEBdjJUPKsDmGk6gpdSHJEzSnGwIfy8Jlf8=
+    - secure: 2PPJhwjfjd8IRcVbaZpzAStuV1qXeb8vc7BCFq0OvJCLoU9BTcxHCYO8/E/xAjVcZI3hv/PXxa5Fym1DisNw9iOVo/L3VDETTuRFftllcLyuTjEOWpvMcv5bWVe57zn+e5pcHtbaxiQ3TBk4OyQce8+uwaXMh0LA+9p3rKwqSw0dtSaPZQawAjJReia/tdJJgdzm4hxHg3p9bZFII/3432qnkFH9+WmbIsl5KcfwHd5cvHwjJrrSjsMS1Vm1za5BGuSxmB8lTEyeKpHs1Ev779UMUsOAy9kyW3jeC5+ic66gP+Al+k2LaagvtXo0C5AIpBhmCcpoBfF9CllMyx7+0IV3sksF6XKWBfDGsD7jkPCTHrm3qSD3ben1QY4WEpS74P+5pemdrKBkUPSF80zPWGLufYwTalldlq8hDXd5EupZbGuq060TqZ66ET9Htou+kPYtUU+dohTE2Z+2ukksnmmJLxN06jTwr0CR89EFUWIHHYSw+WtUKOsg0pB5tB8q5UK32Sogi4BFznUm46ygpi9BFGzuoJOPZgRBiiRXrCyWmbewmgwk6xyWMhSIxh/hBVSUv6d8PMg/8DqDd+aKnPLvoRVRa7NOgnl96//noE6etgWI4nJvYdujIRrSNEsMkajVap9Jdbkg27hjVacstl6dRv46AFu0Qp6XjcxsVeM=
+
+after_success:
+  - docker --version
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+  - pip install --user awscli
+  - export PATH=$PATH:/.local/bin
+  - eval $(aws ecr get-login --no-include-email --region us-west-2)
+  - docker build -t hubot-ash:$COMMIT .
+  - docker tag hubot-ash:$COMMIT $AWS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/hubot-ash:$TAG
+  - docker tag hubot-ash:$COMMIT $AWS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/hubot-ash:travis-$TRAVIS_BUILD_NUMBER
+  - docker push $AWS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/hubot-ash:$COMMIT
