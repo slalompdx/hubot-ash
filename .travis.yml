@@ -5,11 +5,14 @@ sudo: required
 # What language do we use for the build
 language: node_js
 node_js:
-  - '4'
+  - stable
 
 # enable docker
 services:
   - docker
+
+notifications:
+  email: false
 
 env:
   global:
@@ -25,7 +28,7 @@ script:
 
 after_success:
   - docker --version
-  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo "$TRAVIS_BRANCH" ; fi`
+  - export TAG=`if [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then echo "latest"; else echo "rc" ; fi`
   - echo "COMMIT $COMMIT TAG $TAG TRAVIS_BRANCH $TRAVIS_BRANCH"
   - pip install --user awscli
   - export PATH=$PATH:/.local/bin
