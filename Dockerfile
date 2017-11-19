@@ -3,6 +3,7 @@ MAINTAINER Adam Crews <adamc@slalom.com>
 
 # Install Dependencies
 RUN apk update && apk upgrade \
+  && apk add git \
   && apk add nodejs \
   && apk add nodejs-npm \
   && apk add python \
