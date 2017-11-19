@@ -2,8 +2,10 @@
 # We need sudo to docker things
 sudo: required
 
-# A language is required, but we don't actually use it.
-language: ruby
+# What language do we use for the build
+language: node_js
+node_js:
+  - '4'
 
 # enable docker
 services:
