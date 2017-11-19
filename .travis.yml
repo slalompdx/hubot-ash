@@ -28,4 +28,4 @@ after_success:
   - docker build -t hubot-ash:$COMMIT .
   - docker tag hubot-ash:$COMMIT $AWS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/hubot-ash:$TAG
   - docker tag hubot-ash:$COMMIT $AWS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/hubot-ash:travis-$TRAVIS_BUILD_NUMBER
-  - docker push $AWS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/hubot-ash:$COMMIT
+  - docker push $AWS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/hubot-ash
