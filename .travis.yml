@@ -27,13 +27,11 @@ script:
   - docker build -t hubot-ash:$COMMIT .
 
 after_success:
-  - docker --version
-  - export TAG=`if [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then echo "latest"; else echo "rc" ; fi`
-  - echo "COMMIT $COMMIT TAG $TAG TRAVIS_BRANCH $TRAVIS_BRANCH"
   - pip install --user awscli
   - export PATH=$PATH:/.local/bin
   - eval $(aws ecr get-login --no-include-email --region us-west-2)
-  - docker tag hubot-ash:$COMMIT $AWS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/hubot-ash:$TAG
+  - docker tag hubot-ash:$COMMIT $AWS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/hubot-ash:$COMMIT
   - docker tag hubot-ash:$COMMIT $AWS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/hubot-ash:travis-$TRAVIS_BUILD_NUMBER
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]] && [[ "$TRAVIS_BRANCH" == "master" ]]; then docker tag hubot-ash:$COMMIT $AWS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/hubot-ash:master; fi
   - docker push $AWS_ECR_ID.dkr.ecr.us-west-2.amazonaws.com/hubot-ash
 
